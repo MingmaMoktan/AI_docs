@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2>Upload Your Project ZIP</h2>
+    {% if error %}
+        <div class="alert alert-danger">{{ error }}</div>
+    {% endif %}
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary mt-3">Upload</button>
+    </form>
+</div>
+{% endblock %}
