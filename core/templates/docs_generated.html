@@ -1,8 +1,11 @@
-{% extends 'base.html' %}
+<h2>Generated Documents for Project {{ project.id }}</h2>
 
-{% block content %}
-<div class="container mt-5">
-    <h2>Project {{ project.id }} Extracted Successfully</h2>
-    <p>Next step: parse files and generate docs (LLM integration coming soon).</p>
-</div>
-{% endblock %}
+{% if docs %}
+    <ul>
+    {% for doc in docs %}
+        <li>{{ doc.content|linebreaks }}</li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>No docs generated yet. Parsing is pending.</p>
+{% endif %}

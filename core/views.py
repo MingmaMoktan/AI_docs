@@ -5,6 +5,7 @@ from django.contrib.auth.decorators import login_required
 from django.conf import settings
 from .forms import UploadForm
 from .models import ProjectUpload
+from .utils import parse_and_generate_docs  # Parsing utility
 
 # -------------------------------
 # Home Page (no login required)
@@ -28,14 +29,23 @@ def upload_project(request):
 
             # Extract ZIP file
             file_path = project.uploaded_file.path
-            extract_dir = os.path.join(settings.BASE_DIR, "media", "extracted", str(project.id))
+            extract_dir = os.path.join(settings.MEDIA_ROOT, "extracted", str(project.id))
             os.makedirs(extract_dir, exist_ok=True)
 
             try:
                 with zipfile.ZipFile(file_path, 'r') as zip_ref:
                     zip_ref.extractall(extract_dir)
+
+                # Update project with extracted path
                 project.extracted_path = extract_dir
                 project.save()
+
+                # -------------------------------
+                # Parse files and generate docs
+                # -------------------------------
+                parse_result = parse_and_generate_docs(project)
+                print(f"[INFO] Project {project.id}: {parse_result}")
+
             except zipfile.BadZipFile:
                 # Handle invalid ZIP
                 project.delete()
@@ -44,8 +54,9 @@ def upload_project(request):
                     "error": "Uploaded file is not a valid ZIP."
                 })
 
-            # Redirect to docs view
+            # Redirect to docs view after successful upload and parsing
             return redirect("view_docs", project_id=project.id)
+
     else:
         form = UploadForm()
 
@@ -59,6 +70,10 @@ def upload_project(request):
 def view_docs(request, project_id):
     project = get_object_or_404(ProjectUpload, id=project_id, user=request.user)
 
+    # Pass the actual docs to template
+    docs = project.docs.all()
+
     return render(request, "docs_generated.html", {
-        "project": project
+        "project": project,
+        "docs": docs,
     })
