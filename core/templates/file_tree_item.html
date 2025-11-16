@@ -1,0 +1,12 @@
+<li class="{% if item.type == 'dir' %}folder{% else %}file{% endif %}">
+  {% if item.type == 'dir' %}
+    <span>{{ item.name }}</span>
+    <ul>
+      {% for child in item.children %}
+        {% include "file_tree_item.html" with item=child %}
+      {% endfor %}
+    </ul>
+  {% else %}
+    <a href="{% url 'file_view' project.id %}?path={{ item.path|urlencode }}" target="_blank">{{ item.name }}</a>
+  {% endif %}
+</li>

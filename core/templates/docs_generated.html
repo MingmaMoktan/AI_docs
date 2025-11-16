@@ -1,11 +1,38 @@
-<h2>Generated Documents for Project {{ project.id }}</h2>
+{% extends "base.html" %}
+{% load static %}
 
-{% if docs %}
-    <ul>
-    {% for doc in docs %}
-        <li>{{ doc.content|linebreaks }}</li>
-    {% endfor %}
-    </ul>
-{% else %}
-    <p>No docs generated yet. Parsing is pending.</p>
-{% endif %}
+{% block content %}
+<h2>Generated Documentation for {{ project.uploaded_file.name }}</h2>
+
+<h3>AI Generated Docs</h3>
+<ul>
+  {% for doc in docs %}
+    {% if doc.generated_by_ai %}
+      <li><a href="#doc-{{ forloop.counter }}">{{ doc.filename }}</a></li>
+    {% endif %}
+  {% endfor %}
+</ul>
+
+<h3>Raw Files</h3>
+<ul>
+  {% for doc in docs %}
+    {% if not doc.generated_by_ai %}
+      <li>
+        {{ doc.filename }}
+        <a href="{% url 'file_view' project.id %}?path={{ doc.filename|urlencode }}" target="_blank">View</a>
+      </li>
+    {% endif %}
+  {% endfor %}
+</ul>
+
+<hr>
+
+{% for doc in docs %}
+<div id="doc-{{ forloop.counter }}" style="margin-bottom:2rem;">
+  <h4>{{ doc.filename }}</h4>
+  <div style="border:1px solid #ccc; padding:10px; background:#f9f9f9;">
+    {{ doc.content_html|safe }}
+  </div>
+</div>
+{% endfor %}
+{% endblock %}

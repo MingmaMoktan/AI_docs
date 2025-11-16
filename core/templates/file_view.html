@@ -1,19 +1,23 @@
-{% if error %}
-    <div class="alert alert-danger">{{ error }}</div>
-{% else %}
-    {% if mime == "markdown" %}
-        <div class="markdown-body">
-            {{ content|safe }}
-        </div>
+{% extends "base.html" %}
+{% load static %}
 
-    {% else %}
-        <pre><code>{{ content|escape }}</code></pre>
-    {% endif %}
+{% block content %}
+<h2>Viewing File: {{ path }}</h2>
+
+{% if error %}
+<p style="color:red;">{{ error }}</p>
+{% else %}
+<div>
+  {% if mime == "markdown" %}
+    {{ content|safe }}
+  {% elif mime == "code" %}
+    <pre><code class="language-{{ prism_lang }}">{{ content|escape }}</code></pre>
+  {% else %}
+    <pre>{{ content|escape }}</pre>
+  {% endif %}
+</div>
 {% endif %}
 
-<link rel="stylesheet"
- href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/default.min.css">
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
-
-<script>hljs.highlightAll();</script>
+<link rel="stylesheet" href="{% static 'prism/prism.css' %}">
+<script src="{% static 'prism/prism.js' %}"></script>
+{% endblock %}
