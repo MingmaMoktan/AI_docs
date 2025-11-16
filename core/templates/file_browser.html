@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h3>Project {{ project.id }} — File Browser</h3>
+        <a class="btn btn-secondary" href="{% url 'view_docs' project.id %}">Generated Docs</a>
+    </div>
+
+    {% if error %}
+    <div class="alert alert-danger">{{ error }}</div>
+    {% endif %}
+
+    <div class="row">
+        <div class="col-md-4">
+            <h5>Files</h5>
+            <div id="file-tree" class="list-group">
+                {% include "partials/tree.html" with nodes=tree parent="" %}
+            </div>
+        </div>
+
+        <div class="col-md-8">
+            <h5>Preview</h5>
+            <div id="preview" class="p-3 border rounded bg-light">
+                <i>Select a file to preview</i>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener("click", function(e){
+    // folder toggle
+    if (e.target.classList.contains("toggle-folder")) {
+        const target = e.target.dataset.target;
+        const el = document.querySelector(`[data-folder="${target}"]`);
+        if (el) el.style.display = (el.style.display === "none") ? "block" : "none";
+    }
+
+    // file preview
+    if (e.target.classList.contains("file-link")) {
+        e.preventDefault();
+        fetch(e.target.href)
+            .then(r => r.text())
+            .then(html => {
+                document.getElementById("preview").innerHTML = html;
+                if (window.hljs) hljs.highlightAll();
+            });
+    }
+});
+</script>
+{% endblock %}

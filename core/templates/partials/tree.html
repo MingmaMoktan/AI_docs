@@ -1,0 +1,17 @@
+{% for item in nodes %}
+    {% if item.type == "dir" %}
+        <div class="list-group-item">
+            <span class="toggle-folder" data-target="{{ item.path|urlencode }}"
+                  style="cursor:pointer;">📁 {{ item.name }}</span>
+
+            <div data-folder="{{ item.path|urlencode }}" style="margin-left:20px; display:none;">
+                {% include "partials/tree.html" with nodes=item.children parent=item.path %}
+            </div>
+        </div>
+    {% else %}
+        <a href="{% url 'file_view' project.id %}?path={{ item.path|urlencode }}"
+           class="list-group-item file-link">
+            📄 {{ item.name }}
+        </a>
+    {% endif %}
+{% endfor %}
